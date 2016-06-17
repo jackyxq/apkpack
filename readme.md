@@ -1,7 +1,108 @@
 # ApkPackageTool
-Android channel package tool £¨°²×¿ÇşµÀ´ò°ü¹¤¾ß£©
+Android channel package tool ï¼ˆå®‰å“æ¸ é“æ‰“åŒ…å·¥å…·ï¼‰
 
-# ¸Ã´ò°üÊ¹ÓÃÁË3ÖÖ´ò°ü·½Ê½
-	1¡¢²Î¿¼ÃÀÍ¼µÄ·½Ê½£¬ÔÚMETA-INFÄ¿Â¼ÏÂÔö¼ÓÒ»¸ö±êÊ¶ÎÄ¼şÀ´±êÊ¶ÇşµÀÃû³Æ
-	2¡¢¸ù¾İzipµÄÌØĞÔ£¬Íùzip commentÖĞĞ´ÈëÇşµÀÃû³Æ
-	3¡¢ÔÚAndroidManifest.xmlÖĞÌí¼Ó metaÔªËØµÄ·½Ê½À´±êÊ¶ÇşµÀ£¬Í¬Ê±ÓÖ±ÜÃâÁËÓ¦ÓÃµÄ·´±àÒëÓë±àÒë¼õÉÙ´ò°üÊ±¼ä¼°²»Í¬apktool°æ±¾³åÍ»ÎÊÌâ
+è¯¥æ‰“åŒ…ä½¿ç”¨äº†3ç§æ‰“åŒ…æ–¹å¼
+---------------------------
+	1ã€å‚è€ƒç¾å›¾çš„æ–¹å¼ï¼Œåœ¨META-INFç›®å½•ä¸‹å¢åŠ ä¸€ä¸ªæ ‡è¯†æ–‡ä»¶æ¥æ ‡è¯†æ¸ é“åç§°
+	2ã€æ ¹æ®zipçš„ç‰¹æ€§ï¼Œå¾€zip commentä¸­å†™å…¥æ¸ é“åç§°
+	3ã€åœ¨AndroidManifest.xmlä¸­æ·»åŠ  metaå…ƒç´ çš„æ–¹å¼æ¥æ ‡è¯†æ¸ é“ï¼Œ
+	åŒæ—¶åˆé¿å…äº†åº”ç”¨çš„åç¼–è¯‘ä¸ç¼–è¯‘å‡å°‘æ‰“åŒ…æ—¶é—´åŠä¸åŒapktoolç‰ˆæœ¬å†²çªé—®é¢˜
+	
+
+é¡¹ç›®ä»‹ç»
+---------------------------
+	ApkPack_*.jar åˆ†åˆ«å¯¹åº”ä¸åŒæ‰“åŒ…æ–¹å¼çš„å¯æ‰§è¡Œæ–‡ä»¶ï¼Œè¿è¡Œå¯æ‰§è¡Œæ–‡ä»¶éœ€è¦å®‰è£… jdkï¼Œå»ºè®®å®‰è£…jdk8ã€‚æ‰“åŒ…æ•ˆç‡æ–¹å¼2æœ€å¿«ï¼Œæ–¹å¼3æœ€æ…¢ï¼Œå¦‚æœé¡¹ç›®ä¸­åº”ç”¨äº†å‹ç›Ÿçš„ç»Ÿè®¡åŠŸèƒ½ï¼Œå»ºè®®ä½¿ç”¨æ–¹å¼3
+	
+Androidä»£ç è·å–æ¸ é“åç§°çš„æ–¹å¼ä¹Ÿå„æœ‰ä¸åŒ
+---------------------------
+###  æ–¹å¼1
+	public static String getMetaInfChannel(Context context) {
+		ApplicationInfo appinfo = context.getApplicationInfo();
+        String sourceDir = appinfo.sourceDir;
+        String ret = "";
+        ZipFile zipfile = null;
+        try {
+            zipfile = new ZipFile(sourceDir);
+            Enumeration<?> entries = zipfile.entries();
+            while (entries.hasMoreElements()) {
+                ZipEntry entry = ((ZipEntry) entries.nextElement());
+                String entryName = entry.getName();
+                if (entryName.startsWith("META-INF/ch_")) {
+                    ret = entryName;
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (zipfile != null) {
+                try {
+                    zipfile.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        int ind = ret.indexOf('_');
+        if (ind == -1) {
+        	return "website"; //é»˜è®¤çš„æ¸ é“åç§°
+        } else {
+        	return ret.substring(ind + 1);
+        }
+	}
+	
+###  æ–¹å¼2 ï¼ˆéœ€è¦ä½¿ç”¨åˆ°ç¬¬ä¸‰æ–¹åŒ…zip4jï¼Œåœ¨libsç›®å½•ä¸‹ï¼‰
+	@SuppressLint("NewApi")
+	public static String getCommentChannel(Context context) {
+		ApplicationInfo appinfo = context.getApplicationInfo();
+        String sourceDir = appinfo.sourceDir;
+        String ret = "";
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        	ZipFile zipfile = null;
+            try {
+                	zipfile = new ZipFile(sourceDir);
+                	ret = zipfile.getComment();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (zipfile != null) {
+                    try {
+                        zipfile.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        } else {
+        	ret = readComment(sourceDir);
+        }
+
+        if(ret == null) {
+        	return "website"; //é»˜è®¤çš„æ¸ é“åç§°
+        } else {
+        	return ret;
+        }
+	}
+
+	private static String readComment(String f) {
+		net.lingala.zip4j.core.ZipFile zipfile = null;
+		try {
+			zipfile = new net.lingala.zip4j.core.ZipFile(f);
+			return zipfile.getComment();
+		} catch (ZipException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+###  æ–¹å¼3
+	public static String getManifestChannel(Context context) {
+		try {
+			String name = context.getPackageName();
+			ApplicationInfo info = context.getPackageManager().getApplicationInfo(name, PackageManager.GET_META_DATA);
+			return info.metaData.getString("umeng_channel");
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return "website";
+	}
