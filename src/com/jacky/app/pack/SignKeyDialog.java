@@ -15,12 +15,12 @@ import javax.swing.JTextField;
 public class SignKeyDialog extends JDialog {
 
 	PackFrame frame;
-	JTextField pathText, pwdText, aliasText, apwdText;
+	JTextField pathText, pwdText, aliasText, apwdText, jdkText;
 	
 	public SignKeyDialog(PackFrame f) {
 		super(f, true);
 		frame = f;
-		setSize(360, 250);
+		setSize(360, 300);
 		setLocationRelativeTo(null);
 		setLayout(null);
 		setTitle("签名文件信息");
@@ -59,8 +59,18 @@ public class SignKeyDialog extends JDialog {
 		apwdText.setBounds(80, 115, 250, 25);
 		add(apwdText);
 		
+		label = new JLabel("JDK目录：");
+		label.setBounds(10, 150, 80, 25);
+		add(label);
+		
+		jdkText = new JTextField();
+		jdkText.setBounds(80, 150, 250, 25);
+		jdkText.addMouseListener(new DirChooserListener());
+		jdkText.setEditable(false);
+		add(jdkText);
+		
 		JButton btn = new JButton("保存");
-		btn.setBounds(135, 160, 80, 35);
+		btn.setBounds(135, 195, 80, 35);
 		btn.addActionListener(new ActionListener() {
 			
 			@Override
@@ -76,6 +86,7 @@ public class SignKeyDialog extends JDialog {
 			pwdText.setText(sign.pwd);
 			aliasText.setText(sign.alias);
 			apwdText.setText(sign.apwd);
+			jdkText.setText(sign.jdk);
 		}
 	}
 	
@@ -84,7 +95,8 @@ public class SignKeyDialog extends JDialog {
 		String pw = pwdText.getText();
 		String ali = aliasText.getText();
 		String apw = apwdText.getText();
-		frame.getConfigManager().saveSignInfo(p, pw, ali, apw);
+		String jdk = jdkText.getText();
+		frame.getConfigManager().saveSignInfo(p, pw, ali, apw, jdk);
 		setVisible(false);
 	}
 	
@@ -103,6 +115,24 @@ public class SignKeyDialog extends JDialog {
 				pathText.setText(path);
 			}
 		}
-		
 	}
+	
+	private class DirChooserListener extends MouseAdapter {
+		
+		@Override
+		public void mouseClicked(MouseEvent e) {
+			ConfigManager m = frame.getConfigManager();
+			
+			JFileChooser chooser = new JFileChooser(m.getLastApkPath());
+			chooser.setDialogTitle("请选择JDK目录");
+			chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);//只能选择目录
+			int i = chooser.showOpenDialog(SignKeyDialog.this);
+			if(JFileChooser.APPROVE_OPTION == i) {
+				String path = chooser.getSelectedFile().getAbsolutePath();
+				m.saveLastApkPath(path);
+				jdkText.setText(path);
+			}
+		}
+	}
+	
 }

@@ -7,6 +7,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -26,8 +27,9 @@ public class LinkLabel extends JLabel {
 		super("<html>" + vText + "</html>");
 		this.text = vText;
 		try {
-			if (!vLink.startsWith("http://"))
+			if (!(vLink.startsWith("https://") || vLink.startsWith("http://"))) {
 				vLink = "http://" + vLink;
+			}
 			this.link = new URL(vLink);
 		} catch (MalformedURLException err) {
 			err.printStackTrace();
@@ -53,7 +55,8 @@ public class LinkLabel extends JLabel {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				try {
-					Desktop.getDesktop().browse(link.toURI());
+					URI u = link.toURI();
+					Desktop.getDesktop().browse(u);
 				} catch (IOException err) {
 					err.printStackTrace();
 				} catch (URISyntaxException err) {

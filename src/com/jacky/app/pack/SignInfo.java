@@ -6,4 +6,5 @@ public class SignInfo {
 	public String pwd;
 	public String alias;
 	public String apwd;
+	public String jdk;
 }

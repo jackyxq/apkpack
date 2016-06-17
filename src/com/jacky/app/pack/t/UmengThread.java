@@ -108,9 +108,8 @@ public class UmengThread extends BaseThread {
 		executor.submit(new Runnable() {
 			@Override
 			public void run() {
-				//TODO jarsigner 所在的位置需要在系统环境配置或者代码中加上路径
-				StringBuilder b = new StringBuilder("C:/Progra~2/Java/jdk1.8.0_77/bin/");
-				b.append("jarsigner.exe -keystore ").append(info.path)
+				StringBuilder b = new StringBuilder(info.jdk);
+				b.append("/bin/jarsigner.exe -keystore ").append(info.path)
 					.append(" -signedjar ").append(name).append(" ").append(name).append(" ")
 					.append(info.alias).append(" -storepass ").append(info.pwd)
 					.append(" -sigalg SHA1withRSA -digestalg SHA1");

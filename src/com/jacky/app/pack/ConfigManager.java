@@ -64,16 +64,18 @@ public class ConfigManager {
 		info.pwd = obj.optString("pwd");
 		info.alias = obj.optString("alias");
 		info.apwd = obj.optString("apwd");
+		info.jdk = obj.optString("jdk");
 		return info;
 	}
 	
-	public void saveSignInfo(String path, String pwd, String alias, String apwd) {
+	public void saveSignInfo(String path, String pwd, String alias, String apwd, String jdk) {
 		JSONObject obj = new JSONObject();
 		try {
 			obj.put("path", path);
 			obj.put("pwd", pwd);
 			obj.put("alias", alias);
 			obj.put("apwd", apwd);
+			obj.put("jdk", jdk);
 			mRootNode.put("sign", obj);
 		} catch (JSONException e) {
 			e.printStackTrace();
